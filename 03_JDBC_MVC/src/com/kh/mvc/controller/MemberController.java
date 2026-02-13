@@ -1,5 +1,7 @@
 package com.kh.mvc.controller;
 
+import java.util.List;
+
 import com.kh.mvc.model.service.MemberService;
 import com.kh.mvc.model.vo.Member;
 import com.kh.mvc.view.MemberView;
@@ -31,6 +33,18 @@ public class MemberController {
 		}else {
 			new MemberView().displayFail("회원 추가 실패");
 		}		
+	}
+
+	public void selectAll() {
+		// SELECT -> ResultSet -> List<Mebmer>
+		List<Member> list = mService.selectAll();
+		
+		if(list.isEmpty()) {
+			new MemberView().displayNodata("전체 조회 결과가 없습니다..");
+		}else {
+			new MemberView().displayList(list);
+		}
+		
 	}
 
 }

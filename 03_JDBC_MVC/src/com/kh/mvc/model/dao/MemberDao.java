@@ -2,7 +2,10 @@ package com.kh.mvc.model.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.kh.mvc.model.vo.Member;
 
@@ -50,6 +53,45 @@ public class MemberDao {
 		return result;
 	}
 
+	
+	public List<Member> selectAll(Connection conn){
+		// 변수 셋팅
+		List<Member> list = new ArrayList<>();
+		PreparedStatement pstmt = null;
+		ResultSet rset = null;
+		String sql = "SELECT * FROM MEMBER";
+		
+		try {
+			pstmt = conn.prepareStatement(sql);
+			rset = pstmt.executeQuery();
+			
+			while(rset.next()) {
+				Member m = new Member();
+				m.setMemberId(rset.getString("MEMBER_ID"));
+				m.setMemberName(rset.getString("MEMBER_NAME"));
+				m.setPhone(rset.getString("PHONE"));
+				m.setAge(rset.getInt("AGE"));
+				m.setEnrollDate(rset.getDate("ENROLL_DATE"));
+				
+				list.add(m);
+			}
+			
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				rset.close();
+				pstmt.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return list;
+	}
+	
+	
 }
 
 

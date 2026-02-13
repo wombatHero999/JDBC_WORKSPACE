@@ -3,6 +3,7 @@ package com.kh.mvc.model.service;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.List;
 
 import com.kh.mvc.model.dao.MemberDao;
 import com.kh.mvc.model.vo.Member;
@@ -39,6 +40,12 @@ public class MemberService {
 			e.printStackTrace();
 		}
 		return result;
+	}
+
+	public List<Member> selectAll() {
+		Connection conn = DriverManager
+				.getConnection("jdbc:oracle:thin:@localhost:1521:xe","JDBC","JDBC");
+		
 	}
 
 }
