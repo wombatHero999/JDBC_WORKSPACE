@@ -1,11 +1,16 @@
 package com.kh.mvc.model.dao;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.InvalidPropertiesFormatException;
 import java.util.List;
+import java.util.Properties;
 
 import com.kh.mvc.common.template.JDBCTemplate;
 import com.kh.mvc.model.vo.Member;
@@ -23,10 +28,26 @@ public class MemberDao {
 	 * @param m : controller에서 래핑처리하여 전달
 	 * @return 처리된 행의 갯수(int) 
 	 * */
+	
+	private Properties prop = new Properties();
+	
+	{
+		try {
+			prop.loadFromXML(new FileInputStream("resources/member_mapper.xml"));
+		} catch (InvalidPropertiesFormatException e) {
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public int insertMember(Connection conn, Member m) {
 		int result = 0;
 		PreparedStatement pstmt = null;
-		String sql = "INSERT INTO MEMBER VALUES(?, ?, ?, ?, ?,?,?,?, SYSDATE )";
+//		String sql = "INSERT INTO MEMBER VALUES(?, ?, ?, ?, ?,?,?,?, SYSDATE )";
+		String sql = prop.getProperty("insertMember");
 		
 		try {
 			pstmt = conn.prepareStatement(sql);
@@ -60,7 +81,8 @@ public class MemberDao {
 		List<Member> list = new ArrayList<>();
 		PreparedStatement pstmt = null;
 		ResultSet rset = null;
-		String sql = "SELECT * FROM MEMBER";
+//		String sql = "SELECT * FROM MEMBER";
+		String sql = prop.getProperty("selectAll");
 		
 		try {
 			pstmt = conn.prepareStatement(sql);
@@ -97,8 +119,9 @@ public class MemberDao {
 		Member m = null;
 		PreparedStatement pstmt = null;
 		ResultSet rset = null;
-		String sql = "SELECT * FROM MEMBER "
-				+ "WHERE MEMBER_ID = ?";
+//		String sql = "SELECT * FROM MEMBER "
+//				+ "WHERE MEMBER_ID = ?";
+		String sql = prop.getProperty("selectByUserId");
 		
 		try {
 			pstmt = conn.prepareStatement(sql);
@@ -128,8 +151,9 @@ public class MemberDao {
 		List<Member> list = new ArrayList<>();
 		PreparedStatement pstmt = null;
 		ResultSet rset = null;
-		String sql = "SELECT * FROM MEMBER WHERE MEMBER_NAME LIKE ?";
-	
+		//String sql = "SELECT * FROM MEMBER WHERE MEMBER_NAME LIKE ?";
+		String sql = prop.getProperty("selectByUserName");
+		
 		try {
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, "%"+keyword+"%");

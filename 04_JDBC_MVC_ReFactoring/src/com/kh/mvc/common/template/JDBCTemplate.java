@@ -1,10 +1,15 @@
 package com.kh.mvc.common.template;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Properties;
+
+import org.apache.commons.dbcp2.BasicDataSource;
 
 // JDBC과정 중 자주 등장하는 구문들을 각각의 메서드로 정의한 클래스
 // 1. DB와 접속된 Connection을 생성하여 반환하는 메서드
@@ -37,20 +42,70 @@ public class JDBCTemplate {
 	 *  - 커넥션 객체를 미리 생성하여 보관해두다가, 사용자가 요청할 때마다 커넥션을 전달해주는
 	 *    객체. 
 	 *  - 대표 커넥션풀 구현 라이브러리 : DBCP, HikariCP, Tomcat DataSource
-	 *  
 	 *  */
 	public static Connection getConnection() {
 		
 		Connection conn = null;
+		
+		// 드라이버정보 로딩용 Properties객체 생성
+		Properties prop = new Properties();
 		try {
-			Class.forName("oracle.jdbc.driver.OracleDriver");
-			conn = DriverManager
-				.getConnection("jdbc:oracle:thin:@localhost:1521:xe",
-						"JDBC","JDBC");
-			conn.setAutoCommit(false);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+						
+			/* 
+			 * BasicDataSource
+			 *  - javax.sql.DataSource를 구현한 클래스
+			 *    DataSource는 db와의 연결 및 커넥션풀 관리, 트랜잭션관리를 위한
+			 *    방법들을 정의한 인터페이스
+			 *  - 데이터베이스에 연결 및 커넥션 풀 생성 등 커넥션을 관리할 수 있는
+			 *  효율적인 메서드를 제공한다.
+			 * */
+			//Class.forName("oracle.jdbc.driver.OracleDriver");
+			BasicDataSource dataSource = new BasicDataSource();
+			
+			prop.load(new FileInputStream("resources/driver.properties"));
+			
+			// 생성하고자 하는 커네션에 대한 정보 기술
+//			dataSource.setDriverClassName("oracle.jdbc.driver.OracleDriver");
+//			dataSource.setUrl("jdbc:oracle:thin:@localhost:1521:xe");
+//			dataSource.setUsername("JDBC");
+//			dataSource.setPassword("JDBC");
+			dataSource.setDriverClassName(prop.getProperty("driver"));
+			dataSource.setUrl(prop.getProperty("url"));
+			dataSource.setUsername(prop.getProperty("username"));
+			dataSource.setPassword(prop.getProperty("password"));
+			dataSource.setInitialSize(10); // 초키 커넥션풀 사이즈(기본값0)
+			dataSource.setMaxTotal(50);// 커넥션풀이 가질 수 있는 최대커넥션 수. (기본 8)
+			dataSource.setDefaultAutoCommit(false);
+			dataSource.setMaxWaitMillis(10000);// 최대 대기 시간설정. 10초가 지나면 에러발생.
+			dataSource.setRemoveAbandonedTimeout(300);// 사용하고 있지 않은 커넥션 삭제
+			
+			conn = dataSource.getConnection();
+			
+			/*
+			 * 	커넥션풀의 장점
+ 			 *   - 성능향상 : 커넥션풀은 데이터베이스 연결을 미리 생성하고 풀에 유지
+ 			 *   함으로써 어플리케이션의 성능을 향상시킬수 있다.(생성시의 비용문제해결)
+ 			 *   - 메모리 누수 방지 : 사용하고 닫아두 않는 커넥션들을 일정시간이 
+ 			 *   지났을때 자동으로 삭제처리해주는 알고리즘이 장착되어 있다.
+ 			 *   - 확장성 : 커넥션풀에서 만들어놓은 다양한 옵션을 통해 원하는 성능의
+ 			 *   커넥션풀을 생성할 수 있다.
+ 			 *   
+ 			 *   커넥션풀의 단점
+ 			 *   - 코드가 많아진다
+ 			 *   - 메모리사용량이 증가한다.
+ 			 *   - 초기 생성비용이 크다.
+			 *  */
+//			conn = DriverManager
+//				.getConnection("jdbc:oracle:thin:@localhost:1521:xe",
+//						"JDBC","JDBC");
+//			conn.setAutoCommit(false);
 		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return conn;

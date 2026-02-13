@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	<entry key="insertMember">
+		INSERT INTO MEMBER VALUES(?, ?, ?, ?, ?,?,?,?, SYSDATE )
+	</entry>
+	
+	<entry key="selectAll">
+		SELECT * FROM MEMBER
+	</entry>
+	
+	<entry key="selectByUserName">
+		SELECT *
+		FROM MEMBER
+		WHERE MEMBER_NAME LIKE ?
+	</entry>
+	
+	<entry key="selectByUserId">
+		SELECT *
+		FROM MEMBER
+		WHERE MEMBER_ID = ?
+	</entry>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+</properties>
+
+
